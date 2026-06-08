@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Produtos\Schemas;
 
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class ProdutoForm
@@ -10,7 +11,13 @@ class ProdutoForm
     {
         return $schema
             ->components([
-                //
+                TextInput::make('nome')
+                    ->required(),
+                TextInput::make('marca')
+                    ->required(),
+                TextInput::make('estoque')
+                    ->required()
+                    ->default('0'),
             ]);
     }
 }

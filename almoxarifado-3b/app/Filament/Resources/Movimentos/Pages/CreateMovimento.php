@@ -4,46 +4,60 @@ namespace App\Filament\Resources\Movimentos\Pages;
 
 use App\Filament\Resources\Movimentos\MovimentoResource;
 use Filament\Resources\Pages\CreateRecord;
+use App\Models\Produto;
+use App\Models\Movimento;
+use Filament\Notifications\Notification;
 
 class CreateMovimento extends CreateRecord
 {
     protected static string $resource = MovimentoResource::class;
-        
+
+    /**
+     * O que este função faz?
+     * 
+     * @param $data recebeos dados
+     * @param $produto recebe uma lista com os dados dos produtos pelo id
+     * 
+     */
+
     protected function beforeCreate(): void
     {
         //recebe a lista de produtos
         $data = $this->data;
 
-        //·selecionando. o· produto/qtd e.tipo pelo id recebido.na lista
-        $produto = Produto :: find($data['produto_id' ]);
+        // selecionando o produto/qtd e tipo pelo id recebido na lista
+        $produto = Produto::find($data['produto_id']);
         $quantidade = $data['quantidade'];
         $tipo = $data['tipo'];
 
-        //·Verificar se é.uma saida e se o estoque é suficiente
+
+        // Verificar se é uma saída e se o estoque é suficiente
         if ($tipo === 's' && $quantidade > $produto->estoque) {
-            //.Notificar.o usuario sobre o estoque insuficiente
+            // Notificar o usuário sobre o estoque insuficiente
             Notification::make()
                 ->danger()
                 ->title('Estoque Insuficiente!')
-                ->body("O estoque de '{$produto->nome} ' e de apenas {$produto->estoque} unidade, mas você tentou retirar {$quantidade}.")
+                ->body("O estoque de '{$produto->nome}' é de apenas {$produto->estoque} unidade, mas você tentou retirar {$quantidade}.") 
                 ->send();
 
-        $this->halt(); // Impedea criacão.do moviment.o
-            }
+            $this->halt(); // Impede a criação do movimento
         }
+    }
 
-        //Hook - Remover ou aumentar o estoque
+    //Hook - Remover ou aumentar o estoque 
     protected function afterCreate(): void
     {
         $movimento = $this->getRecord(); // Registro do movimento criado
         $produto = $movimento->produto; // Produto relacionado ao movimento
 
         if ($movimento->tipo === 'e') {
-        // Entrada: Aumentar o estoque
-        $produto->increment('estoque', $movimento->quantidade);
-        } else{
-        // Saída: Dimiuiro stq
-        $produto->decrement('estoque', $movimento->quantidade);
+            // Entrada: Aumentar o estoque
+            $produto->increment('estoque', $movimento->quantidade);
+        } else {
+            // Saída: Diminuir o estoque
+            $produto->decrement('estoque', $movimento->quantidade);
         }
+
     }
+
 }

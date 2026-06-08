@@ -7,11 +7,11 @@ use App\Models\Movimento;
 
 class Produto extends Model
 {
-    protected $fillable =[
+    protected $fillable = [
         "nome", "marca", "estoque"
     ];
 
     public function movimentos() {
-        return $this->belongsTo(Movimento::class);
+        return $this->hasMany(Movimento::class);
     }
 }

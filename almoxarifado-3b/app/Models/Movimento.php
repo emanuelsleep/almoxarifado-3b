@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Produto;
 
 class Movimento extends Model
 {
@@ -11,6 +12,6 @@ class Movimento extends Model
     ];
 
     public function produto() {
-        return $this->belongsTo(produto::class, "produto_id");
+        return $this->belongsTo(Produto::class, "produto_id");
     }
 }
